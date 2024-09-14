@@ -3,17 +3,11 @@ import pino from 'pino-http';
 import cors from 'cors';
 
 import { env } from './utils/env.js';
-import { getAllStudents, getStudentById } from './services/students.js';
+import { getAllContacts, getContactById} from './services/contacts.js';
 
 const PORT = Number(env('PORT', '3000'));
 
-// import dotenv from "dotenv";
-// dotenv.config();
-
-// const PORT = 3000;
-// const PORT = Number(process.env.PORT);
-
-export const startServer = () => {
+export const setupServer = () => {
     const app = express();
 
     app.use(express.json());
@@ -40,30 +34,31 @@ export const startServer = () => {
             });
     });
 
-    // app.get('/students', async (req, res) => {
-    // });
-    app.get('/students', async (req, res) => {
-        const students = await getAllStudents();
+    app.get('/contacts', async (req, res) => {
+        const contacts = await getAllContacts();
+        console.log(contacts);
         res.status(200).json({
-            data: students,
+            status: 200,
+            message: "Successfully found contacts!",
+            data: contacts,
         });
     });
 
-    // app.get('/students/:studentId', async (req, res) => {
-    // });
-    app.get('/students/:studentId', async (req, res, next) => {
-        const { studentId } = req.params;
-        const student = await getStudentById(studentId);
-        // Відповідь, якщо контакт не знайдено
-        if (!student) {
+    app.get('/contacts/:contactId', async (req, res, next) => {
+        const { contactId } = req.params;
+        const contact = await getContactById(contactId);
+
+        if (!contact) {
             res.status(404).json({
-                message: 'Student not found'
+                message: 'Contact not found'
             });
             return;
         }
-        // Відповідь, якщо контакт знайдено
+
         res.status(200).json({
-            data: student,
+            status: 200,
+            message: `Successfully found contact with id ${contactId}!`,
+            data: contact,
         });
     });
 
